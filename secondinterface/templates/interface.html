@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>接口测试</title>
+    <link rel="stylesheet" href="static/int.css" type="text/css">
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+<body>
+<h3>自动化接口测试</h3>
+<div>
+<label>接口名称</label>
+<select id="sel">
+    {% for i in interlist %}
+    <option>{{ i.name }}-{{ i.intername }}</option>
+    {% endfor %}
+</select>
+<button id="loadall">加载全部</button>
+<button id="action">执行</button>
+<div>
+    <p>参数：</p>
+    <textarea  class="param">name=保时捷</textarea>
+</div>
+</div>
+<div id="div1">
+    <div>
+    <p>实际结果</p>
+    <div class="text1"></div>
+    </div>
+    <div >
+    <p>预期结果</p>
+    <textarea class="text2"></textarea>
+    </div>
+
+</div>
+<button id="compare">比较</button>
+<script>
+    $('#loadall').click(function(){
+        $.ajax({
+                    url: "loadall/",
+                    success:function(result){
+                        interlist:result
+                    }
+                }
+        )
+    });
+    $('#action').click(function(){
+        var param=$('.param').val()
+        var sel=$('#sel').val()
+        console.log(param,sel)
+        $.ajax({
+                    url: "action/",
+                    method:"POST",
+                   contentType: "application/json;charset=UTF-8",
+                    data:JSON.stringify({'sel':sel,'param':param}),
+                    success:function(result){
+                       $('.text1').html(result)
+                    }
+                }
+        )
+    });
+    $('#compare').click(function(){
+           var actual=$('.text1').html() //实际结果
+            var expect=$('.text2').val() ; //预期结果
+            var arr=new Array(actual,expect)
+            $.ajax({
+                url:'compare/',
+                method:'post',
+                contentType:"application/json:charset=UTF-8",
+                data:JSON.stringify({'actual':actual,'expect':expect}),
+                success:function(result){
+                    var result = eval('(' + result + ')');
+                    console.log(result)
+                    for(var k=0;k<result.length;k++){
+                        console.log(k,result[k])
+                        var sk=result[k]
+                        console.log(actual.search(sk))
+                        actual=actual.replace(eval("/"+sk+"/gi"),"<b style='color:red'>"+sk+"</b>")
+                        expect=expect.replace(eval("/"+sk+"/gi"),"<b>"+sk+"</b>")
+                    }
+                    $('.text1').html(actual)
+                    $('.text2').val(expect)
+                }
+            })
+        }
+    )
+</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+body{
+    margin:0 auto;
+    padding:0;
+    list-style:none;
+    width:98%;
+}
+h3{
+    text-align:center;
+}
+button{
+    padding:5px;
+    background-color: blue;
+    border-color:blue;
+}
+select{
+    width:400px;
+    margin-right:50px;
+}
+.param{
+    width:49%;
+    height:100px;
+}
+#div1{
+    display: flex;
+    justify-content: space-between;
+}
+#div1>div{
+    display: flex;
+    flex-flow:column nowrap;
+    width:49%;
+    height:450px;
+}
+textarea,.text1{
+    height:100%;
+    width:100%;
+}
+.text1{
+    border:solid #fff 1px;
+}
+#compare{
+    margin:30px 0 0 50%;
+}
