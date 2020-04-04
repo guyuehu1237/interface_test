@@ -18,6 +18,7 @@
 <button id="loadall">加载全部</button>
 <button id="action">执行</button>
 <div>
+    <label for="">请求方式:</label><input id="method"/>
     <p>参数：</p>
     <textarea  class="param">name=保时捷</textarea>
 </div>
@@ -44,15 +45,32 @@
                 }
         )
     });
+    //选择不同的接口，查询请求方式或参数
+    $('#sel').change(
+         function(){
+            var sel=$('#sel').val()
+             $.ajax({
+                 url:'getParam/',
+                 method:"POST",
+                 data:sel,
+                 success: function (re) {
+                     console.log(re)
+                     $('#method').val(re.method)
+                     $('.param').val(re.params)
+                 }
+             })
+         }
+    );
     $('#action').click(function(){
         var param=$('.param').val()
         var sel=$('#sel').val()
+        var method=$('#method').val()
         console.log(param,sel)
         $.ajax({
                     url: "action/",
                     method:"POST",
                    contentType: "application/json;charset=UTF-8",
-                    data:JSON.stringify({'sel':sel,'param':param}),
+                    data:JSON.stringify({'sel':sel,'param':param,'method':method}),
                     success:function(result){
                        $('.text1').html(result)
                     }

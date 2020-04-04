@@ -26,5 +26,7 @@ urlpatterns = [
     path('loadall/',views.loadall),
     path('action/',views.action),
     path('cars/',views.cars),
-    path('compare/',views.compare)
+    path('compare/',views.compare),
+    path('getParam/',views.getParam),
+    path('person/',views.person)
 ]

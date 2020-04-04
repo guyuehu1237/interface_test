@@ -33,7 +33,7 @@ def change(request):
     return HttpResponse(d.intername)
 #接口页面首页
 def interface(request):
-    all_inter=InterTest.objects.values()
+    all_inter=InterTest.objects.values().order_by('pid')
     return render(request,"interface.html",{'interlist':all_inter})
 def loadall(request):
     all_inter=InterTest.objects.values()
@@ -41,18 +41,34 @@ def loadall(request):
     return HttpResponse("ok")
 def cars(request):
     name=request.GET.get('name')
-    c=Cars.objects.values()
-    l=Cars.objects.values().get(name=name)
+    try:
+        #c=Cars.objects.values()
+        l=Cars.objects.values().get(name=name)
+    except Exception as e:
+        print(e)
+        return HttpResponse('查询无记录')
     #objects.values()返回全部数据，类型queryset
     #objects.values().get(name=name)条件查询，返回list,不能list()方法
     #objects.values().filter(name=name)与get方法一样，不过返回queryset
-    print(c,l)
+    #print(c,l)
     data = {}
-    data['list'] = list(c)
+    data['list'] = list(l)
     # dat=str(data)
     # da=json.loads(dat,encoding='utf8')
     # return HttpResponse(da)
     return JsonResponse(data,json_dumps_params={'ensure_ascii':False})
+#增加表person的数据
+@csrf_exempt
+def person(request):
+    data=request.POST
+    print("----0")
+    print(data)
+    name=data.get('name')
+    age=data.get('age','')
+    location=data.get('location','')
+    person=Person(name=name,age=age,location=location)
+    person.save()
+    return HttpResponse('新增成功')
 @csrf_exempt
 def compare(request):
     respon=json.loads(request.body,encoding='utf8')
@@ -67,23 +83,38 @@ def compare(request):
     no_have=exp ^ act
     str_have=str(list(no_have))    #这里str方法，前段返回的是数组对象。
     return HttpResponse(str_have)
+#点击执行后，接收数据，然后执行接口请求
 @csrf_exempt
 def action(request):
     baseurl='http://127.0.0.1:8000/'
-    data=request.POST
+    data=request.body
     reb=json.loads(request.body,encoding='utf8')
-
+    print('00000000000')
     print(data)
     print(reb)
     #处理提交的数据
     url=reb.get('sel').split('-')[1]
     param=reb.get('param','')
+    method=reb.get('method','get')
     params=param_handle(param)
-    urls=baseurl+url
-    re=requests.get(urls,params=params)
+    urls=baseurl+url+'/'
+    print(method)
+    if method == 'get' or method == 'GET':
+        print(1)
+        re=requests.get(urls,params=params)
+    else:
+        print(2)
+        re=requests.post(urls,data=params)
     return HttpResponse(re.content)
-
-
+@csrf_exempt
+def getParam(request):
+    data=request.body
+    print('------')
+    print(data.decode('utf8'))
+    name=data.decode('utf8').split('-')[0]
+    db=InterTest.objects.values('method','params').get(name=name)
+    print(db)
+    return JsonResponse(db,json_dumps_params={'ensure_ascii':False})
 
 '''
 遇到的问题：
